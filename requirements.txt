@@ -5,3 +5,5 @@ pillow-heif
 anthropic
 openai
 google-generativeai
+PyPDF2
+pdf2image
