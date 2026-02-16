@@ -106,7 +106,7 @@ Verstoße niemals gegen dieses Format!]
                     ]
                 }
             ],
-            max_tokens=4000
+            max_completion_tokens=5000
         )
         return response.choices[0].message.content
     except Exception as e:
