@@ -108,7 +108,7 @@ Verstoße niemals gegen dieses Format!
             full_system_prompt += f"\n\nHINTERGRUNDWISSEN AUS SKRIPTEN:\n{pdf_text[:150000]}" # Sicherheits-Limit
 
         response = client.chat.completions.create(
-            model="gpt-5.2",
+            model="gpt-5.1",
             messages=[
                 {"role": "system", "content": full_system_prompt},
                 {
