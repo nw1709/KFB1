@@ -117,9 +117,16 @@ uploaded_file = st.file_uploader("Klausuraufgabe hochladen...", type=["png", "jp
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert('RGB')
-    st.image(image, use_container_width=True)
+    
+    st.image(image, width="stretch")
+    
     if st.button("🚀 ALLE Aufgaben mit GPT-5 lösen", type="primary"):
         with st.spinner("GPT-5 analysiert..."):
             result = solve_with_gpt(image, pdfs)
             st.markdown("### 🎯 Ergebnis")
-            st.write(result)
+            
+            # Sicherheits-Check: Falls das Ergebnis leer ist
+            if result:
+                st.write(result)
+            else:
+                st.warning("Die Analyse wurde abgeschlossen, aber es wurde kein Text zurückgegeben.")
