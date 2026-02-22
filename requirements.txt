@@ -7,3 +7,4 @@ openai
 google-generativeai
 PyPDF2
 pdf2image
+google-genai
