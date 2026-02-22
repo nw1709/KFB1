@@ -109,7 +109,7 @@ def solve_with_gpt(image, pdf_text):
                     {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}}
                 ]}
             ],
-            temperature=0
+            temperature=0.1
         )
         initial_solution = solve_response.choices[0].message.content
 
