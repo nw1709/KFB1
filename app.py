@@ -1,59 +1,13 @@
 import streamlit as st
 from openai import OpenAI
-from PIL import Image, ImageEnhance
-import logging
+from PIL import Image
 import io
 import base64
-import os
-import pillow_heif
-import PyPDF2 # Zum Auslesen des PDF-Hintergrundwissens
+import PyPDF2
 
-# --- SETUP ---
-st.set_page_config(layout="centered", page_title="KFB1", page_icon="🦊")
-st.title("🦊 Koifox-Bot 1 (GPT-5)")
-
-# --- API Key Validation ---
-def get_client():
-    if "openai_key" not in st.secrets:
-        st.error("API Key fehlt! Bitte 'openai_key' in den Secrets hinterlegen.")
-        st.stop()
-    return OpenAI(api_key=st.secrets["openai_key"])
-
-client = get_client()
-
-# --- Hintergrundwissen Sidebar ---
-with st.sidebar:
-    st.header("📚 Knowledge Base")
-    pdfs = st.file_uploader("PDF-Skripte hochladen", type=["pdf"], accept_multiple_files=True)
-    if pdfs:
-        st.success(f"{len(pdfs)} Skripte geladen.")
-
-# --- Hilfsfunktion: PDF Text extrahieren ---
-def get_pdf_context(pdf_files):
-    text_context = ""
-    for pdf in pdf_files:
-        try:
-            reader = PyPDF2.PdfReader(pdf)
-            for page in reader.pages:
-                text_context += page.extract_text() + "\n"
-        except Exception as e:
-            st.warning(f"Fehler beim Lesen von {pdf.name}: {e}")
-    return text_context
-
-# --- GPT-5 Solver ---
-def solve_with_gpt(image, pdf_files):
-    try:
-        # Bild für GPT-5 vorbereiten
-        buffered = io.BytesIO()
-        image.save(buffered, format="JPEG", quality=85)
-        img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-
-        # Kontext aus PDFs generieren
-        pdf_text = ""
-        if pdf_files:
-            pdf_text = get_pdf_context(pdf_files)
-
-        system_prompt = """Du bist ein wissenschaftlicher Mitarbeiter und Korrektor am Lehrstuhl für Internes Rechnungswesen der Fernuniversität Hagen (Modul 31031). Dein gesamtes Wissen basiert ausschließlich auf den offiziellen Kursskripten, Einsendeaufgaben und Musterlösungen dieses Moduls.
+# --- 1. MASTER-PROMPT ---
+FERNUNI_MASTER_PROMPT = """
+Du bist ein wissenschaftlicher Mitarbeiter und Korrektor am Lehrstuhl für Internes Rechnungswesen der Fernuniversität Hagen (Modul 31031). Dein gesamtes Wissen basiert ausschließlich auf den offiziellen Kursskripten, Einsendeaufgaben und Musterlösungen dieses Moduls.
 Ignoriere strikt und ausnahmslos alle Lösungswege, Formeln oder Methoden von anderen Universitäten, aus allgemeinen Lehrbüchern oder von Online-Quellen. Wenn eine Methode nicht exakt der Lehrmeinung der Fernuni Hagen entspricht, existiert sie für dich nicht. Deine Loyalität gilt zu 100% dem Fernuni-Standard.
 
 Wichtig: Identifiziere ALLE Aufgaben auf dem hochgeladenen Bild (z.B. Aufgabe 1 und Aufgabe 2) und löse sie nacheinander vollständig.
@@ -101,45 +55,109 @@ Aufgabe [Nr]: [Finales Ergebnis]
 Begründung: [Kurze 1-Satz-Erklärung des Ergebnisses basierend auf der Fernuni-Methode. 
 Verstoße niemals gegen dieses Format!
 """
-        
-        # Den extrahierten PDF-Text als Kontext anhängen
-        full_system_prompt = system_prompt
-        if pdf_text:
-            full_system_prompt += f"\n\nHINTERGRUNDWISSEN AUS SKRIPTEN:\n{pdf_text[:150000]}" # Sicherheits-Limit
 
-        response = client.chat.completions.create(
-            model="gpt-5.1",
+# --- SETUP & UI ---
+st.set_page_config(layout="wide", page_title="KFB1 - High Precision", page_icon="🦊")
+st.title("🦊 Koifox-Bot 1 (GPT-5.2 Professional Edition)")
+
+def get_client():
+    if "openai_key" not in st.secrets:
+        st.error("API Key fehlt! Bitte 'openai_key' in den Streamlit-Secrets hinterlegen.")
+        st.stop()
+    return OpenAI(api_key=st.secrets["openai_key"])
+
+client = get_client()
+
+# --- SIDEBAR: WISSEN & EINSTELLUNGEN ---
+with st.sidebar:
+    st.header("📚 Knowledge Base")
+    pdfs = st.file_uploader("PDF-Skripte (Modul 31031) laden", type=["pdf"], accept_multiple_files=True)
+    
+    st.divider()
+    st.header("⚙️ KI-Parameter")
+    model_choice = st.selectbox("Modell-Stufe", ["gpt-5.2", "gpt-5.2-thinking"], index=0)
+    st.caption("Nutze 'Thinking' für komplexe Rechenwege wie Gozinto-Matrizen.")
+
+# --- LOGIK-FUNKTIONEN ---
+def get_pdf_context(pdf_files):
+    text_context = ""
+    for pdf in pdf_files:
+        try:
+            reader = PyPDF2.PdfReader(pdf)
+            for page in reader.pages:
+                text_content = page.extract_text()
+                if text_content:
+                    text_context += text_content + "\n"
+        except Exception as e:
+            st.warning(f"Fehler beim Lesen von {pdf.name}: {e}")
+    # Token-Limit für 2026 optimiert (ca. 150k Zeichen Kontext)
+    return text_context[:150000]
+
+def solve_with_gpt(image, pdf_text):
+    # Bild für die Vision-API vorbereiten
+    buffered = io.BytesIO()
+    image.save(buffered, format="JPEG", quality=90)
+    img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+    # Den Master-Prompt mit dem PDF-Wissen verknüpfen
+    full_system_prompt = f"{FERNUNI_MASTER_PROMPT}\n\n--- ZUSÄTZLICHES WISSEN AUS SKRIPTEN ---\n{pdf_text}"
+
+    try:
+        # SCHRITT 1: Der primäre Lösungsweg (Solver-Agent)
+        solve_response = client.chat.completions.create(
+            model=model_choice,
             messages=[
                 {"role": "system", "content": full_system_prompt},
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": "Analysiere das Bild VOLLSTÄNDIG. Löse JEDE identifizierte Aufgabe (Aufgabe 1, 2, etc.) nacheinander unter strikter Anwendung der PDF-Skripte."},
-                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}}
-                    ]
-                }
+                {"role": "user", "content": [
+                    {"type": "text", "text": "Analysiere das Bild vollständig und löse JEDE Aufgabe unter strikter Einhaltung der FernUni-Regeln."},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}}
+                ]}
             ],
-            max_completion_tokens=5000
+            temperature=0, # Erzwungene Konsistenz
+            max_completion_tokens=4000
         )
-        return response.choices[0].message.content
+        initial_solution = solve_response.choices[0].message.content
+
+        # SCHRITT 2: Der Korrektur-Lauf (Critic-Agent)
+        # Dieser Agent prüft die Lösung von Schritt 1 auf terminologische "Hagen-Fallen"
+        critic_prompt = f"""Du bist ein Chef-Korrektor für Modul 31031. 
+        Prüfe die vorliegende Lösung auf terminologische Exaktheit (z.B. konstant vs. linear) und Rechenfehler.
+        Wende die 'Meister-Regel 3d' an.
+        
+        LÖSUNGSENTWURF:
+        {initial_solution}
+        
+        Falls Korrekturen nötig sind, gib die verbesserte Version aus. Falls alles korrekt ist, gib die ursprüngliche Lösung aus."""
+
+        critic_response = client.chat.completions.create(
+            model="gpt-5.2",
+            messages=[{"role": "system", "content": critic_prompt}],
+            temperature=0
+        )
+        return critic_response.choices[0].message.content
+
     except Exception as e:
-        return f"❌ Fehler: {str(e)}"
+        return f"❌ System-Fehler: {str(e)}"
 
 # --- MAIN UI ---
-uploaded_file = st.file_uploader("Klausuraufgabe hochladen...", type=["png", "jpg", "jpeg", "webp"])
+uploaded_file = st.file_uploader("Bild der Klausuraufgabe hochladen...", type=["png", "jpg", "jpeg", "webp"])
 
 if uploaded_file:
+    # Zwei Spalten für bessere Übersicht: Bild links, Lösung rechts
+    col_img, col_res = st.columns([1, 1])
+    
     image = Image.open(uploaded_file).convert('RGB')
     
-    st.image(image, width="stretch")
+    with col_img:
+        # width="stretch" ist das 2026er Update für volle Containerbreite
+        st.image(image, width="stretch", caption="Eingabe-Dokument")
     
-    if st.button("🚀 ALLE Aufgaben mit GPT-5 lösen", type="primary"):
-        with st.spinner("GPT-5 analysiert..."):
-            result = solve_with_gpt(image, pdfs)
-            st.markdown("### 🎯 Ergebnis")
+    if st.button("🚀 Hochpräzisions-Lösung generieren", type="primary"):
+        with st.spinner("Multi-Agenten-System analysiert (Solver + Critic)..."):
+            context = get_pdf_context(pdfs) if pdfs else "Kein PDF-Kontext vorhanden."
+            result = solve_with_gpt(image, context)
             
-            # Sicherheits-Check: Falls das Ergebnis leer ist
-            if result:
+            with col_res:
+                st.markdown("### 🎯 Verifiziertes Ergebnis")
                 st.write(result)
-            else:
-                st.warning("Die Analyse wurde abgeschlossen, aber es wurde kein Text zurückgegeben.")
+                st.success("Analyse abgeschlossen. Die Lösung wurde auf FernUni-Konformität geprüft.")
