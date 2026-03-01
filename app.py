@@ -6,7 +6,7 @@ import io
 import os
 
 # --- 1. UI SETUP ---
-st.set_page_config(layout="wide", page_title="KFB3", page_icon="🦊")
+st.set_page_config(layout="wide", page_title="KFB1", page_icon="🦊")
 
 st.markdown(f'''
 <link rel="apple-touch-icon" sizes="180x180" href="https://em-content.zobj.net/thumbs/120/apple/325/fox-face_1f98a.png">
@@ -14,12 +14,12 @@ st.markdown(f'''
 <meta name="theme-color" content="#FF6600"> 
 ''', unsafe_allow_html=True)
 
-st.title("🦊 Koifox-Bot 3 (Gemini 3.1 Pro Preview)")
+st.title("🦊 KFB1")
 
 # --- 2. API KONFIGURATION ---
 def get_client():
     if 'gemini_key' not in st.secrets:
-        st.error("API Key fehlt! Bitte in den Secrets hinterlegen.")
+        st.error("API Key fehlt. Bitte in den Secrets hinterlegen.")
         st.stop()
     return genai.Client(api_key=st.secrets["gemini_key"])
 
@@ -32,7 +32,7 @@ with st.sidebar:
     if pdfs:
         st.success(f"{len(pdfs)} Skripte geladen.")
     st.divider()
-    st.info("Modell: Gemini 3 Pro Preview | Modus: Full Expert")
+    st.info("model: Gemini 3.1 Pro Preview")
 
 # --- 4. DER MASTER-SOLVER ---
 def solve_everything(image, pdf_files):
@@ -114,7 +114,7 @@ Verstoße niemals gegen dieses Format!]"""
         return response.text
 
     except Exception as e:
-        return f"❌ Fehler: {str(e)}"
+        return f"Fehler: {str(e)}"
 
 # --- 5. UI LAYOUT ---
 col1, col2 = st.columns([1, 1])
@@ -130,10 +130,10 @@ with col1:
 
 with col2:
     if uploaded_file:
-        if st.button("🚀 ALLE Aufgaben mit Gemini 3 lösen", type="primary"):
-            with st.spinner("Gemini 3 Pro Preview denkt nach..."):
+        if st.button("Aufgaben lösen", type="primary"):
+            with st.spinner("Gemini 3.1 Pro löst..."):
                 result = solve_everything(img, pdfs)
-                st.markdown("### 🎯 Ergebnis")
+                st.markdown("### Ergebnis")
                 st.write(result)
     else:
         st.info("Bitte lade links ein Bild hoch.")
