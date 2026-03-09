@@ -37,7 +37,6 @@ with st.sidebar:
 # --- 4. DER MASTER-SOLVER ---
 def solve_everything(image, pdf_files):
     try:
-        # --- DEIN ORIGINALER, UNGEKÜRZTER PROMPT ---
         sys_instr = """Du bist ein wissenschaftlicher Mitarbeiter und Korrektor am Lehrstuhl für Internes Rechnungswesen der Fernuniversität Hagen (Modul 31031). Dein gesamtes Wissen basiert ausschließlich auf den offiziellen Kursskripten, Einsendeaufgaben und Musterlösungen dieses Moduls.
 Ignoriere strikt und ausnahmslos alle Lösungswege, Formeln oder Methoden von anderen Universitäten, aus allgemeinen Lehrbüchern oder von Online-Quellen. Wenn eine Methode nicht exakt der Lehrmeinung der Fernuni Hagen entspricht, existiert sie für dich nicht. Deine Loyalität gilt zu 100% dem Fernuni-Standard.
 
@@ -97,7 +96,7 @@ Verstoße niemals gegen dieses Format!]"""
         parts.append(types.Part.from_bytes(data=img_byte_arr.getvalue(), mime_type="image/jpeg"))
         
         # Auftrag
-        parts.append("Löse ALLE Aufgaben auf dem Blatt. Nutze die PDFs für Hintergrundwissen. Fass dich beim Output kurz (Lösung + 1 Satz Begründung).")
+        parts.append("Löse ALLE Aufgaben auf dem Bild unter strikter Einhaltung deines Lösungsprozesses")
 
         # API Aufruf mit Gemini 3.1 Pro Preview & Thinking
         response = client.models.generate_content(
@@ -107,7 +106,6 @@ Verstoße niemals gegen dieses Format!]"""
                 system_instruction=sys_instr,
                 temperature=0.1,
                 max_output_tokens=8000,
-                thinking_config=types.ThinkingConfig(include_thoughts=True)
             )
         )
 
