@@ -74,7 +74,7 @@ with st.sidebar:
     st.info("model: Gemini 3.1 Pro Preview (mit 6x Retry & Memory)")
 
 # --- 5. DER MASTER-SOLVER (LOGIK) ---
-def solve_everything(image, pdf_files):
+def call_gemini(image, pdf_files):
     try:
         # DEIN ORIGINAL SYSTEM PROMPT
         sys_instr = """Du bist ein wissenschaftlicher Mitarbeiter und Korrektor am Lehrstuhl für Internes Rechnungswesen der Fernuniversität Hagen (Modul 31031). Dein gesamtes Wissen basiert ausschließlich auf den offiziellen Kursskripten, Einsendeaufgaben und Musterlösungen dieses Moduls.
