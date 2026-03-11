@@ -124,7 +124,7 @@ with col1:
         if "rot" not in st.session_state: st.session_state.rot = 0
         if st.button("🔄 Bild drehen"): st.session_state.rot = (st.session_state.rot + 90) % 360
         img = img.rotate(-st.session_state.rot, expand=True)
-        st.image(img, width='stretch)
+        st.image(img, width=stretch)
 
 with col2:
     if uploaded_file:
