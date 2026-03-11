@@ -4,6 +4,8 @@ from google.genai import types
 from PIL import Image
 import io
 import os
+import json
+from google.oauth2 import service_account
 
 # --- 1. UI SETUP ---
 st.set_page_config(layout="wide", page_title="KFB1 - Interaktiv", page_icon="🦊")
@@ -16,25 +18,41 @@ st.markdown(f'''
 
 st.title("🦊 KFB1: Chat-Modus")
 
-# --- 2. API KONFIGURATION (RETRY BLEIBT) ---
 def get_client():
-    if 'gemini_key' not in st.secrets:
-        st.error("API Key fehlt. Bitte in den Secrets hinterlegen.")
-        st.stop()
-    
-    retry_options = types.HttpRetryOptions(
-        initial_delay=2.0,
-        attempts=6,
-        exp_base=2.0,
-        max_delay=30.0,
-        http_status_codes=[429, 500, 502, 503, 504]
-    )
+    # 1. VERSUCH: VERTEX AI (Enterprise-Schiene)
+    if 'gcp_service_account' in st.secrets:
+        try:
+            service_account_info = json.loads(st.secrets["gcp_service_account"])
+            credentials = service_account.Credentials.from_service_account_info(service_account_info)
+            
+            # Retry-Logik für maximale Stabilität
+            retry_options = types.HttpRetryOptions(
+                initial_delay=2.0,
+                attempts=6,
+                exp_base=2.0,
+                max_delay=30.0,
+                http_status_codes=[429, 500, 502, 503, 504]
+            )
+            
+            return genai.Client(
+                vertexai=True, 
+                project=service_account_info["project_id"], 
+                location="us-central1", 
+                credentials=credentials,
+                http_options=types.HttpOptions(retry_options=retry_options)
+            )
+        except Exception as e:
+            st.warning(f"Vertex AI Start fehlgeschlagen, versuche Fallback... ({e})")
 
-    return genai.Client(
-        api_key=st.secrets["gemini_key"],
-        http_options=types.HttpOptions(retry_options=retry_options)
-    )
+    # 2. VERSUCH: STANDARD API KEY (Backup-Schiene)
+    if 'gemini_key' in st.secrets:
+        return genai.Client(api_key=st.secrets["gemini_key"])
+        
+    # Wenn beides fehlt:
+    st.error("🚨 Keine Zugangsdaten gefunden! Bitte gcp_service_account oder gemini_key in den Secrets hinterlegen.")
+    st.stop()
 
+# Client initialisieren
 client = get_client()
 
 # --- 3. SESSION STATE (DAS CHAT-GEDÄCHTNIS) ---
@@ -45,7 +63,8 @@ if "messages" not in st.session_state:
 with st.sidebar:
     st.header("📚 Knowledge Base")
     pdfs = st.file_uploader("PDF-Skripte hochladen", type=["pdf"], accept_multiple_files=True)
-    
+    if pdfs:
+       st.success(f"{len(pdfs)} Skripte geladen.")
     st.divider()
     if st.button("🗑️ Chat-Verlauf löschen", width="stretch"):
         st.session_state.messages = []
@@ -55,7 +74,7 @@ with st.sidebar:
     st.info("model: Gemini 3.1 Pro Preview (mit 6x Retry & Memory)")
 
 # --- 5. DER MASTER-SOLVER (LOGIK) ---
-def call_gemini(image, pdf_files, user_input):
+def solve_everything(image, pdf_files):
     try:
         # DEIN ORIGINAL SYSTEM PROMPT
         sys_instr = """Du bist ein wissenschaftlicher Mitarbeiter und Korrektor am Lehrstuhl für Internes Rechnungswesen der Fernuniversität Hagen (Modul 31031). Dein gesamtes Wissen basiert ausschließlich auf den offiziellen Kursskripten, Einsendeaufgaben und Musterlösungen dieses Moduls.
@@ -209,7 +228,7 @@ if prompt := st.chat_input("Löse die Aufgaben oder gib mir eine Korrektur-Anwei
         with col2:
             with chat_container:
                 with st.chat_message("assistant"):
-                    with st.spinner("Gemini rechnet (mit Retry-Schutz)..."):
+                    with st.spinner("Gemini antwortet..."):
                         answer = call_gemini(img, pdfs, prompt)
                         st.markdown(answer)
                         st.session_state.messages.append({"role": "assistant", "content": answer})
