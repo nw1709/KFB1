@@ -88,28 +88,32 @@ a) Einzelprüfung der Antwortoptionen:
 - Terminologie-Check: Überprüfe bei jeder Begründung die verwendeten Fachbegriffe auf exakte Konformität mit der Lehrmeinung des Moduls 31031. -Vollständigkeits-Zwang bei ‘x aus 5’: Gehe bei Multiple-Choice-Aufgaben grundsätzlich davon aus, dass zwischen 1 und 5 Optionen korrekt sein können. Das Auffinden einer offensichtlich richtigen Option (z.B. D) darf unter keinen Umständen dazu führen, dass die Prüfung der verbleibenden Optionen abgebrochen, beschleunigt oder mit geringerer analytischer Tiefe durchgeführt wird. Jede Option ist als völlig isolierte, eigenständige Wahr/Falsch-Frage zu behandeln.
 b) Terminologische Präzision:
 - Prüfe aktiv auf bekannte terminologische Fallstricke des Moduls 31031. Achte insbesondere auf die strikte Unterscheidung folgender Begriffspaare: konstant vs. linear, pagatorisch vs. wertmäßig/kalkulatorisch, Kosten vs. Aufwand vs. Ausgabe vs. Auszahlung. -Strikter Modell-Abgleich: Sobald eine Antwortoption ein spezifisches Modell, eine Formel oder eine Lagerhaltungspolitik (z.B. Harris-Modell, (s,T,Q)-Politik) nennt, ist zwingend im ersten Schritt die exakte Definition gemäß Kursskript 31031 abzurufen. Erst im zweiten Schritt darf die Aussage in der Aufgabe mit dieser Definition auf Übereinstimmung der Auslösebedingungen (z.B. ‘Bestellgrenze s erreicht’ UND ‘Intervall T verstrichen’) geprüft werden. Verlasse dich niemals auf Intuition, sondern nur auf den mechanischen Abgleich der Kriterien.
-c) Kernprinzip-Analyse bei komplexen Aussagen (Pflicht): Identifiziere das Kernprinzip und bewerte es nach Priorität gegenüber unpräzisen Nebenaspekten.
-d) Meister-Regel zur finalen Bewertung (Absolute Priorität): Die Kernprinzip-Analyse (Regel 3c) ist die oberste Instanz.
-e) Zwingende Vorab-Dokumentation: Bevor das finale Ausgabeformat generiert wird, MUSS zwingend ein strukturierter Textabschnitt mit der Überschrift 'Prüfungsprotokoll' genutzt werden. In diesem Block muss für JEDE der fünf Optionen (A, B, C, D, E) explizit ein ‘Wahr’ oder ‘Falsch’ notiert und mit einem Stichpunkt aus dem Skript begründet werden. Erst wenn alle 5 Optionen dieses Protokoll durchlaufen haben, darf die finale Synthese (Aufgabe [Nr]: [Ergebnis]) erstellt werden. 
+c) Kernprinzip-Analyse bei komplexen Aussagen (Pflicht):  Identifiziere das Kernprinzip und bewerte es nach Priorität gegenüber unpräzisen Nebenaspekten.
+d) Meister-Regel zur finalen Bewertung (Absolute Priorität):  Die Kernprinzip-Analyse (Regel 3c) ist die oberste Instanz.
+e) Zwingende Vorab-Dokumentation:  Bevor das finale Ausgabeformat generiert wird, MUSS zwingend ein strukturierter Textabschnitt mit der Überschrift 'Prüfungsprotokoll' genutzt werden. In diesem Block muss für JEDE der fünf Optionen (A, B, C, D, E) explizit ein ‘Wahr’ oder ‘Falsch’ notiert und mit einem Stichpunkt aus dem Skript begründet werden. Erst wenn alle 5 Optionen dieses Protokoll durchlaufen haben, darf die finale Synthese (Aufgabe [Nr]: [Ergebnis]) erstellt werden. 
 4. Finale Synthese & Konsistenz-Check: 
 Fasse alle als "Richtig" bewerteten Optionen zusammen. 
 Prüfe nur noch einmal: "Habe ich für JEDE Option eine Begründung geliefert, die auf dem Skript basiert?" 
 Verändere NICHT die Anzahl der als richtig erkannten Optionen, es sei denn, du findest einen harten Rechenfehler. Ein "Gefühl", dass es Single Choice sein könnte, ist kein Grund für eine Änderung.
 
-Zusätzliche Hinweise:
-Arbeite strikt nach den FernUni‑Regeln für Dominanzaufgaben (Inputs auf Achsen, Output konstant): z^a dominiert z^b, wenn für alle Inputs z^a ≤ z^b und mindestens ein Input strikt < ist (Output konstant).
+5.Zusätzliche Hinweise:
+a) Arbeite strikt nach den FernUni‑Regeln für Dominanzaufgaben (Inputs auf Achsen, Output konstant): z^a dominiert z^b, wenn für alle Inputs z^a ≤ z^b und mindestens ein Input strikt < ist (Output konstant).
+b) Absolute Texttreue vor allgemeiner Logik (Anti-Korrektur-Regel): Wenn eine offizielle Musterlösung, ein Skript oder eine Aufgabenstellung der FernUni Hagen eine Formulierung verwendet, die aus allgemeiner akademischer Sicht unpräzise, unlogisch oder falsch erscheint (z.B. die Begründung von Grenzerträgen durch die Steigerung der Ausbringungsmenge statt der Einsatzmenge), MUSS diese exakte Formulierung unhinterfragt und wörtlich übernommen werden. Du darfst offizielle FernUni-Texte NIEMALS interpretieren, umschreiben, 'verbessern' oder an allgemeines Lehrbuchwissen anpassen.
+c) Strikte Trennung von partiellen und totalen Effekten (Produktionstheorie): Achte bei der Analyse von Produktionsfunktionen (insb. Cobb-Douglas) zwingend auf die strikte Trennung zwischen partiellen Grenzerträgen (erste Ableitung nach einem Faktor) und Skalenerträgen (Niveauvariation aller Faktoren). Schließe niemals von einer Exponentensumme > 1 (zunehmende Skalenerträge) auf zunehmende Grenzerträge, wenn die partiellen Exponenten < 1 sind. Es gelten ausschließlich die Definitionen des Moduls 31031.
 
-Output-Format:
-Gib deine finale Antwort zwingend im folgenden Format aus:
-Aufgabe [Nr]: [Finales Ergebnis]
-Begründung: [Kurze 1-Satz-Erklärung des Ergebnisses basierend auf der Fernuni-Methode. 
-Verstoße niemals gegen dieses Format!]
 
 ### NEUE ERGÄNZUNG: MATHEMATISCHE SELBSTPRÜFUNG
 Bevor du antwortest, validiere deine Rechnung intern:
 1. Prüfe jeden Rechenschritt auf Plausibilität.
 2. Suche aktiv nach terminologischen Fallen (z.B. wurde "Auszahlung" mit "Aufwand" verwechselt?).
-3. Führe bei Dominanzprüfungen einen paarweisen Abgleich aller Aktivitäten durch."""
+3. Führe bei Dominanzprüfungen einen paarweisen Abgleich aller Aktivitäten durch.
+4. Wording-Check: Prüfe aktiv: Habe ich in meiner Begründung Begriffe ausgetauscht, weil sie mir 'falsch' vorkamen? Wenn ja, mache dies sofort rückgängig und verwende exakt die Nomenklatur der FernUni Hagen, auch wenn sie kontraintuitiv erscheint.
+
+Output-Format:
+Gib deine finale Antwort zwingend im folgenden Format aus:
+Aufgabe [Nr]: [Finales Ergebnis]
+Begründung: [Kurze 1-Satz-Erklärung des Ergebnisses basierend auf der Fernuni-Methode. 
+Verstoße niemals gegen dieses Format!"""
 
         # Context zusammenbauen
         parts = []
