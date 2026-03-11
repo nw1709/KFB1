@@ -105,7 +105,7 @@ Verstoße niemals gegen dieses Format!]"""
             config=types.GenerateContentConfig(
                 system_instruction=sys_instr,
                 temperature=0,
-                max_output_tokens=8000,
+                max_output_tokens=15000,
             )
         )
 
