@@ -23,7 +23,10 @@ def get_client():
     if 'gcp_service_account' in st.secrets:
         try:
             service_account_info = json.loads(st.secrets["gcp_service_account"])
-            credentials = service_account.Credentials.from_service_account_info(service_account_info)
+            credentials = service_account.Credentials.from_service_account_info(
+                service_account_info,
+                scopes=['https://www.googleapis.com/auth/cloud-platform']
+            )
             
             # Retry-Logik für maximale Stabilität
             retry_options = types.HttpRetryOptions(
@@ -39,7 +42,7 @@ def get_client():
                 project=service_account_info["project_id"], 
                 location="us-central1", 
                 credentials=credentials,
-                http_options=types.HttpOptions(retry_options=retry_options)
+                http_options=types.HttpOptions(retry_options=retry_options, timeout=120.0)
             )
         except Exception as e:
             st.warning(f"Vertex AI Start fehlgeschlagen, versuche Fallback... ({e})")
@@ -74,7 +77,7 @@ with st.sidebar:
     st.info("model: Gemini 3.1 Pro Preview (mit 6x Retry & Memory)")
 
 # --- 5. DER MASTER-SOLVER (LOGIK) ---
-def call_gemini(image, pdf_files):
+def solve_everything(image, pdf_files, user_input):
     try:
         # DEIN ORIGINAL SYSTEM PROMPT
         sys_instr = """Du bist ein wissenschaftlicher Mitarbeiter und Korrektor am Lehrstuhl für Internes Rechnungswesen der Fernuniversität Hagen (Modul 31031). Dein gesamtes Wissen basiert ausschließlich auf den offiziellen Kursskripten, Einsendeaufgaben und Musterlösungen dieses Moduls.
@@ -158,13 +161,12 @@ Verstoße niemals gegen dieses Format!"""
 
         # Context zusammenbauen
         parts = []
+        # Dokumente & Bild hinzufügen
         if pdf_files:
             for pdf in pdf_files:
-                pdf_data = pdf.read()
-                parts.append(types.Part.from_bytes(data=pdf_data, mime_type="application/pdf"))
+                parts.append(types.Part.from_bytes(data=pdf.read(), mime_type="application/pdf"))
                 pdf.seek(0)
         
-        # Bild hinzufügen
         img_byte_arr = io.BytesIO()
         image.save(img_byte_arr, format='JPEG')
         parts.append(types.Part.from_bytes(data=img_byte_arr.getvalue(), mime_type="image/jpeg"))
@@ -201,7 +203,7 @@ with col1:
             st.session_state.rot = (st.session_state.rot + 90) % 360
             st.rerun()
         img = img.rotate(-st.session_state.rot, expand=True)
-        st.image(img, use_container_width=True)
+        st.image(img, width="stretch")
 
 with col2:
     # Chat History anzeigen
@@ -224,11 +226,9 @@ if prompt := st.chat_input("Löse die Aufgaben oder gib mir eine Korrektur-Anwei
                  with st.chat_message("user"):
                      st.markdown(prompt)
         
-        # Assistant Antwort
-        with col2:
-            with chat_container:
-                with st.chat_message("assistant"):
-                    with st.spinner("Gemini antwortet..."):
-                        answer = call_gemini(img, pdfs, prompt)
-                        st.markdown(answer)
-                        st.session_state.messages.append({"role": "assistant", "content": answer})
+        with st.chat_message("assistant"):
+                with st.spinner("Gemini antwortet via Vertex..."):
+                    # FIX: Jetzt werden alle 3 benötigten Variablen übergeben
+                    answer = solve_everything(img, pdfs, prompt)
+                    st.markdown(answer)
+                    st.session_state.messages.append({"role": "assistant", "content": answer})
