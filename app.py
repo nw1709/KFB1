@@ -40,7 +40,7 @@ def get_client():
             return genai.Client(
                 vertexai=True, 
                 project=service_account_info["project_id"], 
-                location="us-central1", 
+                location="europe-west3", 
                 credentials=credentials,
                 http_options=types.HttpOptions(retry_options=retry_options, timeout=300.0)
             )
