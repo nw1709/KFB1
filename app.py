@@ -42,7 +42,7 @@ def get_client():
                 project=service_account_info["project_id"], 
                 location="us-central1", 
                 credentials=credentials,
-                http_options=types.HttpOptions(retry_options=retry_options, timeout=120.0)
+                http_options=types.HttpOptions(retry_options=retry_options, timeout=300.0)
             )
         except Exception as e:
             st.warning(f"Vertex AI Start fehlgeschlagen, versuche Fallback... ({e})")
@@ -168,8 +168,13 @@ Verstoße niemals gegen dieses Format!"""
                 pdf.seek(0)
         
         img_byte_arr = io.BytesIO()
-        image.save(img_byte_arr, format='JPEG')
+        max_size = 1600
+        if max(image.size) > max_size:
+            image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+        
+        image.save(img_byte_arr, format='JPEG', quality=85) # Quality 85 spart massiv Platz
         parts.append(types.Part.from_bytes(data=img_byte_arr.getvalue(), mime_type="image/jpeg"))
+        
 
         # Historie hinzufügen für das "Gedächtnis"
         for m in st.session_state.messages:
