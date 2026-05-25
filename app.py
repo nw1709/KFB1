@@ -159,21 +159,23 @@ Gib deine finale Antwort zwingend im folgenden Format aus:
 Aufgabe [Nr]: [Finales Ergebnis]
 Begründung: [Kurze 1-Satz-Erklärung des Ergebnisses basierend auf der Fernuni-Methode. 
 Verstoße niemals gegen dieses Format!"""
-        # Context zusammenbauen
+
+    # Multimodaler Input
         parts = []
-        # Dokumente & Bild hinzufügen
         if pdf_files:
             for pdf in pdf_files:
-                parts.append(types.Part.from_bytes(data=pdf.read(), mime_type="application/pdf"))
+                # Wir lesen die PDF-Daten einmal ein
+                pdf_data = pdf.read()
+                parts.append(types.Part.from_bytes(data=pdf_data, mime_type="application/pdf"))
+                # Zeiger zurücksetzen, falls die Funktion mehrfach aufgerufen wird
                 pdf.seek(0)
         
+        # Bildbytes
         img_byte_arr = io.BytesIO()
-        max_size = 1600
-        if max(image.size) > max_size:
-            image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
-        
-        image.save(img_byte_arr, format='JPEG', quality=85) # Quality 85 spart massiv Platz
-        parts.append(types.Part.from_bytes(data=img_byte_arr.getvalue(), mime_type="image/jpeg"))
+        image.save(img_byte_arr, format='JPEG')
+        parts.append(types.Part.from_bytes(data=img_byte_arr.getvalue(), mime_type="image/jpeg"))	
+		
+        parts.append("Löse ALLE Aufgaben auf dem Bild unter strikter Einhaltung deines Lösungsprozesses")
         
 
         # Historie hinzufügen für das "Gedächtnis"
