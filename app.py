@@ -16,7 +16,7 @@ st.markdown(f'''
 <meta name="theme-color" content="#FF6600"> 
 ''', unsafe_allow_html=True)
 
-st.title("🦊 KFB1: Chat-Modus")
+st.title("🦊 KFB1")
 
 def get_client():
     # 1. VERSUCH
@@ -134,14 +134,14 @@ c) Kernprinzip-Analyse bei komplexen Aussagen (Pflicht):  Identifiziere das Ke
 d) Meister-Regel zur finalen Bewertung (Absolute Priorität):  Die Kernprinzip-Analyse (Regel 3c) ist die oberste Instanz.
 
 e) Zwingende Vorab-Dokumentation: Bevor das finale Ausgabeformat generiert wird, MUSS zwingend ein strukturierter Textabschnitt mit der Überschrift 'Prüfungsprotokoll' genutzt werden. Um einen Abbruch durch das Token-Limit zu verhindern, ist hierbei ABSOLUTER TELEGRAMMSTIL zwingend. In diesem Block muss für JEDE der fünf Optionen (A, B, C, D, E) zwingend folgende Struktur eingehalten werden: 
-	1. [Anomalie-Check]: Fällt diese Aussage unter eine der "FERNUNI-HAGEN ANOMALIEN"? (Ja/		Nein).
-	2. [Objekt-Rollen-Check]: Welche Rolle spielen die in der Option genannten Objekte im Text? 			(Input/Verbrauchsfaktor, Input/Potenzialfaktor oder Output/Endprodukt?)
-	3. [Wörtliches Zitat der Option]: (Zitiere den entscheidenden Fachbegriff EXAKT und 				BUCHSTABENGETREU aus dem Bild, z.B. "Wort im Bild: Gebrauchsfaktor"). 
+	1. [Anomalie-Check]: Fällt diese Aussage unter eine der "FERNUNI-HAGEN ANOMALIEN"? (Ja/	Nein).
+	2. [Objekt-Rollen-Check]: Welche Rolle spielen die in der Option genannten Objekte im Text? (Input/Verbrauchsfaktor, Input/Potenzialfaktor oder Output/Endprodukt?)
+	3. [Wörtliches Zitat der Option]: (Zitiere den entscheidenden Fachbegriff EXAKT und BUCHSTABENGETREU aus dem Bild, z.B. "Wort im Bild: Gebrauchsfaktor"). 
 	4. [Faktische Wahrheit laut Skript]: (Maximal 1 kurzer Satz laut Skript).	
-	5. [Mechanischer Zeichen-Abgleich]: Stimmt das wörtliche Zitat (Schritt 3) 					buchstabengetreu mit der Wahrheit (Schritt 4) überein? (Gebrauchsfaktor / 					Verbrauchsfaktor → Nein).
+	5. [Mechanischer Zeichen-Abgleich]: Stimmt das wörtliche Zitat (Schritt 3) buchstabengetreu mit der Wahrheit (Schritt 4) überein? (Gebrauchsfaktor / Verbrauchsfaktor → Nein).
 	6. [Bewertung]: (Wenn Schritt 5 = Ja → Wahr. Wenn Schritt 5 = Nein → Falsch).
 	7. [Begründung]:(Maximal 10 Wörter).
-	8. TOKEN-MANAGEMENT: Führe komplexe Herleitungen (wie die Erstellung der 				Dominanzmatrix oder das Aufstellen von Gleichungssystemen) so kompakt wie möglich durch. Du 		musst nicht jeden einzelnen Rechenschritt textlich ausformulieren, wenn das Ergebnis eindeutig ist. 		Konzentriere deine Text-Ressourcen auf den Abgleich mit den FernUni-Dogmen.
+	8. TOKEN-MANAGEMENT: Führe komplexe Herleitungen (wie die Erstellung der Dominanzmatrix oder das Aufstellen von Gleichungssystemen) so kompakt wie möglich durch. Du musst nicht jeden einzelnen Rechenschritt textlich ausformulieren, wenn das Ergebnis eindeutig ist. Konzentriere deine Text-Ressourcen auf den Abgleich mit den FernUni-Dogmen.
 
 f) Strikter Zeichenabgleich bei mathematischen Termen (Anti-Hineininterpretations-Regel): Wenn eine Antwortoption eine mathematische Formel oder einen Term enthält, musst du die Formel im ersten Schritt völlig unabhängig herleiten. Im zweiten Schritt musst du dein Ergebnis ZEICHEN FÜR ZEICHEN mit dem Text in der Option abgleichen. Beispiel: Wenn deine Herleitung 11,5x+511,5x+5 ergibt, in der Option aber 11,5x+5x11,5x+5x steht, ist die Option ZWINGEND FALSCH. Du darfst NIEMALS annehmen, dass es sich um einen "Tippfehler" in der Klausur handelt. Du darfst NIEMALS annehmen, dass es sich um einen "Tippfehler" in der Klausur handelt. Du darfst NIEMALS eine falsche Formel in der Option als "Wahr" bewerten, nur weil dein eigener Rechenweg richtig war. Abweichung um ein einziges Zeichen = FALSCH. Strikter Zeichenabgleich bei Fachbegriffen (Anti-Auto-Korrektur-Regel): Wenn eine Option einen Fachbegriff enthält, musst du diesen BUCHSTABENGETREU lesen. Du darfst niemals einen falschen Begriff (z.B. 'Gebrauchsfaktor') in deinem Kopf zu dem richtigen Begriff (z.B. 'Verbrauchsfaktor') korrigieren. Abweichung um einen einzigen Buchstaben (G vs. V) = FALSCH. ACHTUNG: Diese strikte Zeichen-für-Zeichen-Regel gilt AUSSCHLIESSLICH für mathematische Formeln und die exakte Nomenklatur von Fachbegriffen (z.B. Verbrauchsfaktor vs. Gebrauchsfaktor). Sie gilt AUSDRÜCKLICH NICHT für Füllwörter, Artikel (der/die/das) oder allgemeine Nomen (z.B. Zigarrenkiste). Ein Grammatikfehler in einem Nicht-Fachbegriff macht eine Option niemals falsch!
 
