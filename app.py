@@ -52,18 +52,16 @@ def get_client():
 
 client = get_client()
 
-# --- 3. SESSION STATE (DAS CHAT-GEDÄCHTNIS) ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- 4. SIDEBAR ---
 with st.sidebar:
     st.header("📚 Knowledge Base")
     pdfs = st.file_uploader("PDF-Skripte hochladen", type=["pdf"], accept_multiple_files=True)
     if pdfs:
        st.success(f"{len(pdfs)} Skripte geladen.")
     st.divider()
-    if st.button("🗑️ Chat-Verlauf löschen", width="stretch"):
+    if st.button("🗑️ Chat-Verlauf manuell löschen", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
     
@@ -186,13 +184,10 @@ Verstoße NIEMALS gegen dieses Format!"""
         parts.append(types.Part.from_bytes(data=img_byte_arr.getvalue(), mime_type="image/jpeg"))    
         
         parts.append("Löse ALLE Aufgaben auf dem Bild unter strikter Einhaltung deines Lösungsprozesses")
-        
 
-        # Historie hinzufügen für das "Gedächtnis"
         for m in st.session_state.messages:
             parts.append(f"{m['role']}: {m['content']}")
             
-        # Neue Nachricht
         parts.append(f"user: {user_input}")
 
         response = client.models.generate_content(
@@ -223,13 +218,27 @@ with col1:
 
 with col2:
     st.subheader("Analyse & Chat")
+    
+    if uploaded_file:
+        if st.button("Aufgaben lösen (Chatverlauf auto-clear)", type="primary", use_container_width=True):
+            st.session_state.messages = []
+            
+            auto_prompt = "Löse alle Aufgaben auf dem hochgeladenen Bild nach deinen strikten Vorgaben."
+            st.session_state.messages.append({"role": "user", "content": auto_prompt})
+            
+            with st.spinner("Gemini analysiert die Klausur initial..."):
+                answer = solve_everything(img, pdfs, auto_prompt)
+                st.session_state.messages.append({"role": "assistant", "content": answer})
+            
+            st.rerun()
+    
     chat_container = st.container(height=600)
     with chat_container:
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-if prompt := st.chat_input("Löse die Aufgaben oder gib mir eine Korrektur-Anweisung..."):
+if prompt := st.chat_input("Chat"):
     if not uploaded_file:
         st.warning("Bitte lade zuerst ein Klausurblatt hoch!")
     else:
@@ -240,7 +249,7 @@ if prompt := st.chat_input("Löse die Aufgaben oder gib mir eine Korrektur-Anwei
                      st.markdown(prompt)
         
         with st.chat_message("assistant"):
-                with st.spinner("Gemini löst..."):
+                with st.spinner("Gemini antwortet..."):
                     answer = solve_everything(img, pdfs, prompt)
                     st.markdown(answer)
                     st.session_state.messages.append({"role": "assistant", "content": answer})
